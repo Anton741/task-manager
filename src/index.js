@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import {Provider, useDispatch, useSelector} from "react-redux"
 import ReactDOM from "react-dom";
-import * as actions from "./store/actions";
+import {taskCompleted, titleChanged, removeTask, loadTasks, getTasks, createTask} from './store/tasks'
 import { initiateStore } from "./store/store";
 
-const store = initiateStore();
-
 const App = (params) => {
-    const [state, setState] = useState(store.getState());
-
+    const dispatch = useDispatch()
+    const state = useSelector(getTasks())
     useEffect(() => {
-        store.subscribe(() => {
-            setState(store.getState());
-        });
+        dispatch(loadTasks())
     }, []);
 
     const completeTask = (taskId) => {
-        store.dispatch(actions.taskCompleted(taskId));
+        dispatch(taskCompleted(taskId));
     };
     const changeTitle = (taskId) => {
-        store.dispatch(actions.titleChanged(taskId));
+        dispatch(titleChanged(taskId));
     };
     const deleteTask = (taskId) => {
-        store.dispatch(actions.deleteTask(taskId));
+        dispatch(removeTask(taskId));
+    }
+    const addTask = (task) => {
+        dispatch(createTask(task))
     }
 
     return (
@@ -45,13 +45,18 @@ const App = (params) => {
                     </li>
                 ))}
             </ul>
+            <button onClick={() => addTask({completed:false, title: "Solve the hometask"})}>
+                Add Task
+                </button>
         </>
     );
 };
 
 ReactDOM.render(
     <React.StrictMode>
-        <App />
+        <Provider store = {initiateStore()}>
+            <App />
+        </Provider>
     </React.StrictMode>,
     document.getElementById("root")
 );

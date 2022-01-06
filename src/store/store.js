@@ -1,11 +1,13 @@
-import { createStore } from "redux";
-import { taskReducer } from "./taskReducer";
+import { combineReducers, configureStore  } from "@reduxjs/toolkit";
+import thunk from 'redux-thunk';
+import errorReducer from "./errors";
+import  taskReducer  from "./tasks";
 
-const initialState = [
-    { id: 1, title: "Task 1", completed: false },
-    { id: 2, title: "Task 2", completed: false },
-];
-
+const rootReducer = combineReducers({tasks:taskReducer, errors:errorReducer})
 export function initiateStore() {
-    return createStore(taskReducer, initialState);
+    return configureStore ({
+        reducer: rootReducer,
+        middleware: [thunk],
+        devTools: process.env.NODE_ENV !=='production',
+    });
 }
